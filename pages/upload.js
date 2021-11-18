@@ -2,11 +2,9 @@ import Head from 'next/head';
 import styles from '../scss/Upload.module.scss';
 import React from 'react';
 import EspLoader, { SlipReadError, readLoop } from '../src/esptool';
-
+import CircularProgress from '@mui/material/CircularProgress';
 
 // -----------
-const updateProgress = (part, percentage) => console.log(`Upload [${part}]: ${percentage}%`);
-
 const logMsg = text => console.log(text);
 
 const debugMsg = (...args) => {
@@ -52,28 +50,7 @@ const debugMsg = (...args) => {
     }
 }
 
-/**
- * @name connect
- * Opens a Web Serial connection to a micro:bit and sets up the input and
- * output stream.
- */
-async function connect() {
-    logMsg("Connecting...")
-    await espTool.connect()
-    readLoop().catch((error) => {
-        console.log("toggleUIConnected -> false");
-        console.log(error);
-    });
-}
-
 const formatMacAddr = macAddr => macAddr.map(value => value.toString(16).toUpperCase().padStart(2, "0")).join(":");
-
-const espTool = new EspLoader({
-    updateProgress,
-    logMsg,
-    debugMsg,
-    debug: false
-});
 
 const firmwareFile = [
     {
@@ -95,35 +72,68 @@ const firmwareFile = [
 ]
 
 export default function Home() {
+    const [ uploadProgress, setUploadProgress ] = React.useState(-1);
+    const [ textProcess, setTextProcess] = React.useState("");
+    const [ uploadFinish, setUploadFinish ] = React.useState(false);
+
+    const updateProgress = (part, percentage) => {
+        console.log(`Upload [${part}]: ${percentage}%`);
+        setUploadProgress(percentage);
+    };
+
     const handleClickUpload = async () => {
+        const espTool = new EspLoader({
+            updateProgress,
+            logMsg,
+            debugMsg,
+            debug: false
+        });
+
         if (espTool.connected()) {
             await espTool.disconnect();
         }
 
-        await connect();
+        setTextProcess("เชื่อมต่อ...");
+        setUploadProgress(-2);
+        await espTool.connect()
+        readLoop().catch((error) => {
+            console.log("toggleUIConnected -> false");
+            console.log(error);
+        });
 
         let espToolStub = null;
         try {
+            setTextProcess("เข้าโหมดอัพโหลด...");
+            setUploadProgress(-2);
             if (await espTool.sync()) {
                 logMsg("Connected to " + await espTool.chipName());
                 logMsg("MAC Address: " + formatMacAddr(espTool.macAddr()));
                 espToolStub = await espTool.runStub();
             } else {
                 console.error("Sync error");
+                setUploadProgress(-1);
                 return;
             }
         } catch (e) {
             console.error(e);
+            setUploadProgress(-1);
             return;
         }
 
         for (const { offset, file } of firmwareFile) {
+            setTextProcess("อัพโหลด " + file);
             const data = await (await fetch(`/firmware/${file}`)).arrayBuffer();
             await espToolStub.flashData(data, offset, file);
         }
 
         await espTool.disconnect();
+        setTextProcess("อัพเดทเสร็จสิ้น");
+        setUploadFinish(true);
     };
+
+    const handleClickGoToHandySense = () => {
+        window.location = "https://dashboard.handysense.io";
+    }
 
     React.useEffect(() => {
         if (!('serial' in navigator)) {
@@ -156,9 +166,24 @@ export default function Home() {
                     <div>
                         <img src="/drawing-nologo.svg" alt="" />
                         <div className="buttonBox">
-                            <button onClick={handleClickUpload}>เชื่อมต่อและอัพโหลด</button>
+                            {uploadProgress === -1 && <button onClick={handleClickUpload}>เชื่อมต่อและอัพโหลด</button>}
+                            {uploadProgress !== -1 && <>
+                                {!uploadFinish && <div className="text1">{uploadProgress === -2 ? textProcess : (uploadProgress + "%")}</div>}
+                                <div className="text2">{uploadProgress >= 0 ? textProcess : ""}</div>
+                                {uploadFinish && <button onClick={handleClickGoToHandySense}>เพิ่มเข้า HandySense</button>}
+                            </>}
                         </div>
-                        <div className="circle"></div>
+                        <div className="circle">
+                            <div>
+                                {(uploadProgress == -2 || uploadProgress >= 0) && <CircularProgress 
+                                    variant={uploadProgress == -2 ? "indeterminate" : "determinate"} 
+                                    value={uploadProgress} 
+                                    sx={{
+                                        color: "#2ECC71"
+                                    }}
+                                />}
+                            </div>
+                        </div>
                     </div>
                 </article>
             </main>
