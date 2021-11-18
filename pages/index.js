@@ -1,6 +1,6 @@
 import Head from 'next/head'
-import Image from 'next/image'
 import styles from '../scss/Home.module.scss'
+import Link from 'next/link';
 
 export default function Home() {
     return (
@@ -22,7 +22,9 @@ export default function Home() {
                         <div>
                             <ul>
                                 <li><a href="javascript:alert('เว็บไซต์ยังไม่พร้อม ... แต่พร้อมเร็ว ๆ นี้ _/|\\_');">เข้าหน้าเว็บไซต์หลัก</a></li>
-                                <li><a href="/upload">อัพเดทเฟิร์มแวร์</a></li>
+                                <li>
+                                    <Link href={"/upload"} passHref><a>อัพเดทเฟิร์มแวร์</a></Link>
+                                </li>
                             </ul>
                         </div>
                     </div>
