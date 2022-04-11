@@ -427,8 +427,9 @@ class EspLoader {
 
     this.logMsg("Connected successfully.")
 
-    this.logMsg("Try to reset.")
+    this.logMsg("Try to reset for upload mode")
     await port.setSignals({ dataTerminalReady: false, requestToSend: true });
+    await new Promise(resolve => setTimeout(resolve, 10));
     await port.setSignals({ dataTerminalReady: true, requestToSend: false });
     await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -448,6 +449,12 @@ class EspLoader {
    * Closes the Web Serial connection.
    */
   async disconnect() {
+    this.logMsg("Try to reset. (2)")
+    await port.setSignals({ dataTerminalReady: false, requestToSend: true });
+    await new Promise(resolve => setTimeout(resolve, 10));
+    await port.setSignals({ dataTerminalReady: false, requestToSend: false });
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     if (reader) {
       await reader.cancel();
       reader = null;

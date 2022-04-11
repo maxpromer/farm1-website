@@ -68,7 +68,9 @@ const firmwareFile = [
     {
         offset: 0x10000,
         // file: "firmware.bin"
-        file: "firmware-sht20.bin"
+        // file: "firmware-sht20.bin"
+        // file: "firmware-sht20-smartconfigs.bin"
+        file: "firmware-sht20-smartconfigs-no-debug.bin"
     }
 ]
 
