@@ -70,7 +70,8 @@ const firmwareFile = [
         // file: "firmware.bin"
         // file: "firmware-sht20.bin"
         // file: "firmware-sht20-smartconfigs.bin"
-        file: "firmware-sht20-smartconfigs-no-debug.bin"
+        // file: "firmware-sht20-smartconfigs-no-debug.bin"
+        file: "firmware-sht20-smartconfigs-new-rtc-no-debug.bin"
     }
 ]
 
