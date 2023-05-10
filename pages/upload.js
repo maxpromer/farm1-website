@@ -54,24 +54,8 @@ const formatMacAddr = macAddr => macAddr.map(value => value.toString(16).toUpper
 
 const firmwareFile = [
     {
-        offset: 0x1000,
-        file: "bootloader.bin"
-    }, 
-    {
-        offset: 0x8000,
-        file: "partitions.bin"
-    },
-    {
-        offset: 0xe000,
-        file: "boot_app0.bin"
-    },
-    {
-        offset: 0x10000,
-        // file: "firmware.bin"
-        // file: "firmware-sht20.bin"
-        // file: "firmware-sht20-smartconfigs.bin"
-        // file: "firmware-sht20-smartconfigs-no-debug.bin"
-        file: "firmware-sht20-smartconfigs-new-rtc-no-debug.bin"
+        offset: 0x0,
+        file: "firmware-farm1-no-debug.bin"
     }
 ]
 
