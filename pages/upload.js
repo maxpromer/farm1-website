@@ -55,7 +55,7 @@ const formatMacAddr = macAddr => macAddr.map(value => value.toString(16).toUpper
 const firmwareFile = [
     {
         offset: 0x1000,
-        file: "bootloader_dio_40m.bin"
+        file: "bootloader.bin"
     }, 
     {
         offset: 0x8000,
